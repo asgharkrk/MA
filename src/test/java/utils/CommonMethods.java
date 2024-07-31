@@ -12,42 +12,87 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Date;
+import java.util.Set;
 
 public class CommonMethods extends PageInitializer {
 
     public static WebDriver driver;
 
-    public void openBrowserAndLaunchApplication() {
-        switch (ConfigReader.read("browser")){
 
+    public static void openBrowserAndLaunchApplication()  {
+        switch (ConfigReader.read("browser")) {
             case "Chrome":
-                ChromeOptions options = new ChromeOptions();
-                options.addArguments("--headless");
-                driver=new ChromeDriver(options);
+                ChromeOptions chromeOptions = new ChromeOptions();
+                chromeOptions.addArguments("--headless");
+                driver = new ChromeDriver(chromeOptions);
                 break;
             case "FireFox":
-                driver=new FirefoxDriver();
+                driver = new FirefoxDriver();
                 break;
             case "Edge":
                 driver = new EdgeDriver();
                 break;
-            case "Safari":
-                driver = new SafariDriver();
-                break;
             default:
                 throw new RuntimeException("Invalid Browser Name");
         }
-        driver.manage().window().maximize();
+        // Implicit wait
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
+        driver.manage().window().maximize();
         driver.get(ConfigReader.read("url"));
-        //this ,method will call all the objects
         initializePageObjects();
+
+        // Load cookies from file
+        loadCookies("cookies.data");
     }
+
+    private static void loadCookies(String filePath) {
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] token = line.split(";");
+                String name = token[0];
+                String value = token[1];
+                String domain = token[2];
+                String path = token[3];
+                Date expiry = null;
+                if (!token[4].equals("null")) {
+                    expiry = sdf.parse(token[4]);
+                }
+                boolean isSecure = Boolean.parseBoolean(token[5]);
+                boolean isHttpOnly = Boolean.parseBoolean(token[6]);
+
+                Cookie cookie = new Cookie(name, value, domain, path, expiry, isSecure, isHttpOnly);
+                driver.manage().addCookie(cookie);
+            }
+            driver.navigate().refresh();  // Refresh to apply cookies
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private static void saveCookies(String filePath) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
+            Set<Cookie> cookies = driver.manage().getCookies();
+            for (Cookie cookie : cookies) {
+                bw.write((cookie.getName() != null ? cookie.getName() : "") + ";"
+                        + (cookie.getValue() != null ? cookie.getValue() : "") + ";"
+                        + (cookie.getDomain() != null ? cookie.getDomain() : "") + ";"
+                        + (cookie.getPath() != null ? cookie.getPath() : "") + ";"
+                        + (cookie.getExpiry() != null ? cookie.getExpiry() : "") + ";"
+                        + cookie.isSecure() + ";"
+                        + cookie.isHttpOnly());
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }}
 
     public void closeBrowser() {
         if(driver!= null) {

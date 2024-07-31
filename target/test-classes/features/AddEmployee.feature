@@ -12,6 +12,7 @@ Feature: Add Employees in HRMS
   Scenario: Adding employee via hard coded data
     When user enters firstName and middleName and lastName
    # And user clicks on save button
+
    # Then employee added successfully
 
   @addemp @regression
@@ -20,7 +21,9 @@ Feature: Add Employees in HRMS
     And user clicks on save button
     Then employee added successfully
 
-    @examples @regression
+
+
+    @examples @regression @Test001
     Scenario Outline: Adding employees for data driven testing from feature file
       When user enters "<firstName>" and "<middleName>" and then "<lastName>"
       And user clicks on save button

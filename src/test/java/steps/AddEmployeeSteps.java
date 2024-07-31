@@ -19,6 +19,7 @@ public class AddEmployeeSteps extends CommonMethods {
 
 
 
+
     String firstNameFE;
     String middleNameFE;
     String lastNameFE;
@@ -28,6 +29,8 @@ public class AddEmployeeSteps extends CommonMethods {
     public void user_clicks_on_add_employee_option() {
        // WebElement addEmployeeButton = driver.findElement(By.xpath("//*[@id='menu_pim_addEmployee']"));
         click(dashboardPage.addEmployeeOption);
+       ;
+
     }
 
     @When("user enters firstName and middleName and lastName")

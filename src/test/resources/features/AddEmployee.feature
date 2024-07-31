@@ -23,7 +23,7 @@ Feature: Add Employees in HRMS
 
 
 
-    @examples @regression
+    @examples @regression @Test001
     Scenario Outline: Adding employees for data driven testing from feature file
       When user enters "<firstName>" and "<middleName>" and then "<lastName>"
       And user clicks on save button

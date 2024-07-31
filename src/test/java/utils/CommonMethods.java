@@ -51,6 +51,12 @@ public class CommonMethods extends PageInitializer {
     }
 
     private static void loadCookies(String filePath) {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            System.out.println("Cookie file not found: " + file.getAbsolutePath());
+            return;
+        }
+
         SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -61,7 +67,7 @@ public class CommonMethods extends PageInitializer {
                 String domain = token[2];
                 String path = token[3];
                 Date expiry = null;
-                if (!token[4].equals("null")) {
+                if (!token[4].equals("null") && !token[4].isEmpty()) {
                     expiry = sdf.parse(token[4]);
                 }
                 boolean isSecure = Boolean.parseBoolean(token[5]);
@@ -96,6 +102,7 @@ public class CommonMethods extends PageInitializer {
 
     public void closeBrowser() {
         if(driver!= null) {
+            saveCookies("cookies.data");
             driver.quit();
         }
     }

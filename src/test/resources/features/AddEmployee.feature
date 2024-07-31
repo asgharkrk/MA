@@ -15,7 +15,7 @@ Feature: Add Employees in HRMS
 
    # Then employee added successfully
 
-  @addemp @regression
+  @addemp @regression @Test001
   Scenario: Adding employee from feature file
     When user enters "aaron" "ms" and "sairam"
     And user clicks on save button
@@ -23,7 +23,7 @@ Feature: Add Employees in HRMS
 
 
 
-    @examples @regression @Test001
+    @examples @regression
     Scenario Outline: Adding employees for data driven testing from feature file
       When user enters "<firstName>" and "<middleName>" and then "<lastName>"
       And user clicks on save button
